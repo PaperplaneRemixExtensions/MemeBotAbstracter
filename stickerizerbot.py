@@ -3,6 +3,8 @@
 # Copyright (C) 2020 Avinash Reddy <https://github.com/AvinashReddy3108>
 
 import re
+import random
+
 from userbot import client
 from userbot.utils.events import NewMessage
 
