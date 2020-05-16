@@ -1,5 +1,7 @@
 # Meme Bots Helper Extension for PaperplaneRemix.
-# Abstracted conversation with @QuotLyBot.
+
+# Abstracted conversation with @QuotLyBot to generate
+# stickers to quote people's famous words [XD].
 
 import datetime
 from telethon import events
@@ -21,30 +23,29 @@ async def quotly(event: NewMessage.Event) -> None:
     if event.fwd_from:
         return
     if not event.reply_to_msg_id:
-        await event.edit("```Reply to any user message.```")
+        await event.edit("`I can't quote the void!`")
         return
     reply_message = await event.get_reply_message()
     if not reply_message.text:
-        await event.edit("```Reply to text message```")
+        await event.edit("`Reply to text message`")
         return
     chat = "@QuotLyBot"
-    if reply_message.sender.bot:
-        await event.edit("```Reply to actual users message.```")
-        return
-    await event.edit("```Making a Quote```")
     async with event.client.conversation(chat) as conv:
         try:
             response = conv.wait_event(
                 events.NewMessage(incoming=True, from_users=1031952739))
             await event.client.forward_messages(chat, reply_message)
             response = await response
+            await client.send_read_acknowledge(conv.chat_id, response)
         except YouBlockedUserError:
-            await event.reply("```Please use /start on @QuotLyBot first```")
+            await event.reply("`You need to` /start `the` @QuotLyBot `first!`")
             return
         if response.text.startswith("Hi!"):
             await event.edit(
-                "```Can you kindly disable your forward privacy settings for good?```"
+                "`Can you kindly disable your forward privacy settings for good?`"
             )
         else:
             await event.delete()
-            await event.client.send_message(event.chat_id, response.message)
+            await event.client.send_message(event.chat_id,
+                                            response.message,
+                                            reply_to=event.reply_to_msg_id)
